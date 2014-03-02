@@ -94,7 +94,7 @@ redirect url looked suspisciously small, but might be ok.  Let's not change it f
     println("registration state is " + state)
     val params = queryParams(Map("response_type" -> "code",  "client_id" -> apiKey, "scope" -> "r_fullprofile r_emailaddress rw_nus r_network r_contactinfo",
     	"state" -> state, 
-        "redirect_url" -> redirectURL(request)  ))
+        "redirect_uri" -> redirectURL(request)  ))
     Redirect("https://www.linkedin.com/uas/oauth2/authorization?" + params).withSession("registrationState" -> state)
   }
 

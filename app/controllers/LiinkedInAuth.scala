@@ -49,7 +49,7 @@ redirect url looked suspisciously small, but might be ok.  Let's not change it f
   }
   
   
-  def parmprac = Action { request =>
+  def parmprac = Action { request =>  
     val heyParm: Option[String] = request.getQueryString("hey")
     
     val combined = for {
@@ -92,9 +92,9 @@ redirect url looked suspisciously small, but might be ok.  Let's not change it f
     //"http://demo-project-c9-groovyflow.c9.io/linkedin/auth/redirect/accept" 
     val state = makeRegistrationState
     println("registration state is " + state)
-    val params = queryParams(Map("response_type" -> "code",  "client_id" -> apiKey, "scope" -> "r_fullprofile r_emailaddress rw_nus r_network r_contactinfo",
-    	"state" -> state, 
-        "redirect_uri" -> redirectURL(request)  ))
+    val params = queryParams(("response_type" -> "code"),  ("client_id" -> apiKey), ("scope" -> "r_fullprofile r_emailaddress rw_nus r_network r_contactinfo"),
+    	("state" -> makeRegistrationState), 
+        ("redirect_uri" -> redirectURL(request))  )  
     Redirect("https://www.linkedin.com/uas/oauth2/authorization?" + params).withSession("registrationState" -> state)
   }
 
@@ -163,11 +163,11 @@ redirect url looked suspisciously small, but might be ok.  Let's not change it f
   }
   
   
-  def queryParams(map: Map[String, String]):String = {
-    if(map.isEmpty)
+  def queryParams(parameters: (String, String)*): String = {
+    if(parameters.isEmpty)
       ""
     else
-    	map.map( entry => URLEncoder.encode(entry._1, "UTF-8") + "=" + URLEncoder.encode(entry._2, "UTF-8")).reduce(_ + "&" + _)
+      parameters.map( entry => URLEncoder.encode(entry._1, "UTF-8") + "=" + URLEncoder.encode(entry._2, "UTF-8")).reduce(_ + "&" + _) 
   }
 
   val possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";

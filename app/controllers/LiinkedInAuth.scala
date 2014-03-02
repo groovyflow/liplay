@@ -17,8 +17,17 @@ object LinkedInAuth extends Controller{
   
   type Request = play.api.mvc.Request[play.api.mvc.AnyContent]
   //TODO: store these somewhere, probably encrypted  Possibly in application.conf
-  val apiKey = "7768r0agsplyix"
-  val secretKey = "osOtOm7sxRXnVtB1"
+ 
+   
+  /*
+  TODO  CHUCK LOOK HERE!!
+  play version doesn't have scope. Need scope=r_fullprofile%20r_emailaddress%20rw_nus%20r_network%20r_contactinfo
+  client-id looks one character too small.  Let's use Tim's keys, which are being used by auth-node
+  state is smaller than that of auth nodes.  Let's do 22 characters instead of 12.
+redirect url looked suspisciously small, but might be ok.  Let's not change it for now
+  */
+  val apiKey = "77143ig0btb0y0"
+  val secretKey = "4HG7fxygIWpRvVrH"
   val redirectUrlScheme = "http"
   val redirectPath = "/li/redirect/accept" //TODO Could we use routes here?
 
@@ -83,7 +92,8 @@ object LinkedInAuth extends Controller{
     //"http://demo-project-c9-groovyflow.c9.io/linkedin/auth/redirect/accept" 
     val state = makeRegistrationState
     println("registration state is " + state)
-    val params = queryParams(Map("response_type" -> "code",  "client_id" -> apiKey, "state" -> state, 
+    val params = queryParams(Map("response_type" -> "code",  "client_id" -> apiKey, "scope" -> "r_fullprofile r_emailaddress rw_nus r_network r_contactinfo",
+    	"state" -> state, 
         "redirect_url" -> redirectURL(request)  ))
     Redirect("https://www.linkedin.com/uas/oauth2/authorization?" + params).withSession("registrationState" -> state)
   }
@@ -161,7 +171,7 @@ object LinkedInAuth extends Controller{
   }
 
   val possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  val numChars = 12
+  val numChars = 22
   def makeRegistrationState() = {
     def nextRand = Math.floor(Math.random() * possible.size).toInt
     def nextChar = possible.charAt(nextRand)

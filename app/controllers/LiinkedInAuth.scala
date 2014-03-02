@@ -93,7 +93,7 @@ redirect url looked suspisciously small, but might be ok.  Let's not change it f
     val state = makeRegistrationState
     println("registration state is " + state)
     val params = queryParams(("response_type" -> "code"),  ("client_id" -> apiKey), ("scope" -> "r_fullprofile r_emailaddress rw_nus r_network r_contactinfo"),
-    	("state" -> makeRegistrationState), 
+    	("state" -> state), 
         ("redirect_uri" -> redirectURL(request))  )  
     Redirect("https://www.linkedin.com/uas/oauth2/authorization?" + params).withSession("registrationState" -> state)
   }

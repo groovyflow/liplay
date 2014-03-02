@@ -1,0 +1,1 @@
+web: target/universal/stage/bin/liplay -Dhttp.port=$PORT $PLAY_OPTS -DapplyEvolutions.default=true

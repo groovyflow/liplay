@@ -9,10 +9,10 @@ GET     /                           controllers.Application.index
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
 
 #TODO Should end up being a POST
-GET     /login/:name                controllers.LinkedInAuth.login(name: String)
+POST     /login              controllers.LinkedInAuth.login
 GET     /show                       controllers.LinkedInAuth.show 
 
 GET    /li/authredirect           controllers.LinkedInAuth.authredirect 
 GET    /li/redirect/accept       controllers.LinkedInAuth.redirectaccept
 
-GET    /parmprac       controllers.LinkedInAuth.parmprac
+GET    /paramprac       controllers.LinkedInAuth.paramprac

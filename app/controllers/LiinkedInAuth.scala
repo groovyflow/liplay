@@ -11,6 +11,7 @@ import scala.util.Try
 import scala.concurrent.Future
 import play.api.libs.json.Json
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.parsing.json.JSONObject
 
 object LinkedInAuth extends Controller{
   //!!!!TODO  Mabye LinkedIn requires that redirect url be https rather than http!!!
@@ -18,56 +19,51 @@ object LinkedInAuth extends Controller{
   type Request = play.api.mvc.Request[play.api.mvc.AnyContent]
   //TODO: store these somewhere, probably encrypted  Possibly in application.conf
  
-   
-  /*
-  TODO  CHUCK LOOK HERE!!
-  play version doesn't have scope. Need scope=r_fullprofile%20r_emailaddress%20rw_nus%20r_network%20r_contactinfo
-  client-id looks one character too small.  Let's use Tim's keys, which are being used by auth-node
-  state is smaller than that of auth nodes.  Let's do 22 characters instead of 12.
-redirect url looked suspisciously small, but might be ok.  Let's not change it for now
-  */
   val apiKey = "77143ig0btb0y0"
   val secretKey = "4HG7fxygIWpRvVrH"
   val redirectUrlScheme = "http"
   val redirectPath = "/li/redirect/accept" //TODO Could we use routes here?
 
 
-  def login(name: String) = Action { request =>
+  def login = Action { request =>
     println("host " + request.host)
     println("path" + request.path)
     println("remote address " +request.remoteAddress)
     println("domain " + request.domain)
     println("request headers:  " + request.headers)
     
-    //TODO  Would rather get this with the  query string, but that's an option, son need
+    //TODO  Would rather get this with the  query string, but that's an option, so need
     //logic to handle bad request.
-    println(request.getQueryString("yo")) //Returns an Option[String]
-    Ok("Welcome!").withSession {
-      "name" -> name
+    println("username param is " + request.getQueryString("username")) //Returns an Option[String]
+    println("password param is " + request.getQueryString("password")) //Returns an Option[String]
+    
+    Ok(Json.obj("status" -> "OK")).withSession {
+      "username" -> request.getQueryString("username").get
     }
 
   }
   
   
-  def parmprac = Action { request =>  
+  def paramprac = Action { request =>  
     val heyParm: Option[String] = request.getQueryString("hey")
     
     val combined = for {
-      hey <- getParam("hey", request)
-      you <- getParam("you", request)
+      hey <- getRequiredParam("hey", request)
+      you <- getRequiredParam("you", request)
     }yield (hey, you) 
     
    
     combined match {
       case Success( (hey, you) ) =>  Ok(hey + " " + you)
-      case Failure(ex) => BadRequest(ex.getMessage)
+      //Problem with Try for this usage: I don't want to show the user the first error; I want to show her all errors
+      case Failure(ex) => BadRequest("Error(s): " + ex.getMessage)
     }
 
     
   }
 
   
- def getParam(key: String, request: Request):Try[String] = Try {
+ def getRequiredParam(key: String, request: Request):Try[String] = Try {
     request.getQueryString(key).getOrElse(throw new Exception("no param named " + key))
  }  
   
@@ -186,7 +182,7 @@ redirect url looked suspisciously small, but might be ok.  Let's not change it f
   
   def show = Action {request =>
     println("Contents of frickin' session: " + request.session)
-    request.session.get("name").map(Ok(_) ).getOrElse(Unauthorized("You are not logged in"))
+    request.session.get("username").map(Ok(_) ).getOrElse(Unauthorized("You are not logged in"))
   }
   
 }
